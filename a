@@ -1,1134 +1,132 @@
-        <main id="main-route">
-            <div class="main-content transaksi">
-                <div class="container">
-                    <ul class="component-tabs nav nav-tabs" id="transactionTabs">
-                    <li class="nav-item">
-        				<a class="button-pills nav-link active" id="nav-deposit-tab" data-toggle="tab" href="#nav-deposit" role="tab" aria-controls="nav-deposit" aria-expanded="false" aria-selected="true">
-        					<i class="fas fa-wallet"></i>
-        					<span>Tambah Dana</span>
-        				</a>
-        			</li>
-        			<li class="nav-item">
-        				<a class="button-pills nav-link" id="nav-withdraw-tab" data-toggle="tab" href="#nav-withdraw" role="tab" aria-controls="nav-withdraw" aria-expanded="false" aria-selected="false">
-        					<i class="fas fa-coins"></i>
-        					<span>Tarik Dana</span>
-        				</a>
-        			</li>
-                    </ul>
-                    <div class="component-tab-content tab-content" id="pills-tabContent">
-                        <div class="tab-pane fade show active" id="nav-deposit" role="tabpanel"
-                            aria-labelledby="nav-deposit-tab">
-                            <div class="transaksi-grid">
-                                <div class="transaksi-payment">
-                                    <div class="transaksi-payment">
-                                        <div class="payment-item">
-                                            <div class="payment-status online">ONLINE</div>
-                                            <div class="payment-body">
-                                                <div class="payment-icon">
-                                                    <img src="https://statis-images.s3.ap-southeast-1.amazonaws.com/global/payment/V2/IDR/epayment/dana.webp"
-                                                        alt="">
-                                                </div>
-                                                <div class="payment-content">
-                                                    <div class="title">DANA</div>
-                                                    <div class="desc"></div>
-                                                    <div class="desc">Deposit Min =
-                                                        <?php echo number_format($min_depo, 0, ',', '.'); ?>
-                                                    </div>
-                                                    <div class="desc"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="payment-item">
-                                            <div class="payment-status online">ONLINE</div>
-                                            <div class="payment-body">
-                                                <div class="payment-icon">
-                                                    <img src="https://statis-images.s3.ap-southeast-1.amazonaws.com/global/payment/V2/IDR/epayment/qris.webp"
-                                                        alt="">
-                                                </div>
-                                                <div class="payment-content">
-                                                    <div class="title">QRIS</div>
-                                                    <div class="desc"></div>
-                                                    <div class="desc">Deposit Min =
-                                                        <?php echo number_format($min_depo, 0, ',', '.'); ?>
-                                                    </div>
-                                                    <div class="desc"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="payment-item">
-                                            <div class="payment-status online">ONLINE</div>
-                                            <div class="payment-body">
-                                                <div class="payment-icon">
-                                                    <img src="https://statis-images.s3.ap-southeast-1.amazonaws.com/global/payment/V2/IDR/bank/bca.webp"
-                                                        alt="">
-                                                </div>
-                                <div class="transaksi-form">
-                                    <?php
-                                    // Query untuk mendapatkan status QRIS saat ini
-                                    $sql = "SELECT status FROM qris_status WHERE id = 1";
-                                    $result = mysqli_query($koneksi, $sql);
-                                    $currentStatus = 'offline';
-        
-                                    if (mysqli_num_rows($result) > 0) {
-                                        $row = mysqli_fetch_assoc($result);
-                                        $currentStatus = $row['status'];
-                                    }
-        
-                                    $sql_trx = "SELECT trxid, status, url FROM tb_transaksi WHERE id_user = '$extplayer' AND status = 'Pending' LIMIT 1";
-                                    $result_trx = mysqli_query($koneksi, $sql_trx);
-                                    $transaction = mysqli_fetch_assoc($result_trx);
-        
-                                    $transactionStatus = $transaction['status'] ?? '';
-                                    $transactionUrl = $transaction['url'] ?? '';
-        
-                                    if ($currentStatus == 'online') {
-                                        ?>
-                                        <div class="component-tabs" style="margin-bottom:10px;">
-                                            <a href="javascript:void(0)" id="btnInstant" class="button-pills nav-link">Instant
-                                                deposit</a>
-                                            <a href="javascript:void(0)" id="btnManual" class="button-pills nav-link active">Manual
-                                                deposit</a>
-                                        </div>
-        
-                                        <script type="text/javascript">
-                                            document.getElementById('btnInstant').addEventListener('click', function () {
-                                                <?php if ($transactionStatus == 'Pending' && !empty($transactionUrl)) { ?>
-                                                    window.location.href = "<?php echo $transactionUrl; ?>";
-                                                <?php } else { ?>
-                                                    document.getElementById('formInstantDeposit').style.display = 'block';
-                                                <?php } ?>
-                                            });
-                                        </script>
-        
-                                        <?php
-                                    }
-                                    
-                                    ?>
-                                    <form id="formInstantDeposit" enctype="multipart/form-data" method="post"
-                                        action="function/qris.php" style="display:none;">
-                                        <div class="transaksi-formulir flip-card">
-                                            <div class="flip-front">
-                                                <div class="formulir-title">
-                                                    <i class="fas fa-wallet"></i> | Formulir Instant Deposit
-                                                </div>
-                                                <div class="formulir-form">
-                                                    <!-- UserID Section -->
-                                                    <div class="form-group">
-                                                        <div class="row">
-                                                            <div class="col-lg-3 d-flex align-items-center">
-                                                                <label>UserID</label>
-                                                            </div>
-                                                            <div class="col-lg-6">
-                                                                <input name="userid" id="userid" class="bg-white" type="text"
-                                                                    readonly
-                                                                    value="<?php echo strtoupper(htmlspecialchars($punya_user['username'])); ?>"
-                                                                    style="color: #333;">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <div class="row">
-                                                            <div class="col-lg-3 d-flex align-items-center">
-                                                                <label>Pilih Metode Pembayaran</label>
-                                                            </div>
-                                                            <div class="col-lg-6">
-                                                                <select name="payment_method" id="payment_method"
-                                                                    class="form-control">
-                                                                    <?php
-                                                                    // Query untuk mengambil semua payment_methods
-                                                                    $query = "SELECT payment_code, payment_name FROM payment_methods WHERE payment_status = 'ON'";
-                                                                    $result = mysqli_query($koneksi, $query);
-        
-                                                                    // Menampilkan opsi untuk dropdown
-                                                                    if (mysqli_num_rows($result) > 0) {
-                                                                        while ($row = mysqli_fetch_assoc($result)) {
-                                                                            ?>
-                                                                            <option
-                                                                                value="<?php echo htmlspecialchars($row['payment_code']); ?>">
-                                                                                <?php echo htmlspecialchars($row['payment_name']); ?>
-                                                                            </option>
-                                                                            <?php
-                                                                        }
-                                                                    } else {
-                                                                        ?>
-                                                                        <option value="">Tidak ada metode pembayaran</option>
-                                                                        <?php
-                                                                    }
-                                                                    ?>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <!-- Deposit Amount Section -->
-                                                    <div class="form-group">
-                                                        <div class="row">
-                                                            <div class="col-lg-3 d-flex align-items-center">
-                                                                <label>Jumlah Deposit</label>
-                                                            </div>
-                                                            <div class="col-lg-6">
-                                                                <div class="row">
-                                                                    <div class="col-lg-5">
-                                                                        <input name="inputdepo" required=""
-                                                                            id="depositinputinstant" type="text"
-                                                                            placeholder="50"
-                                                                            style="font-weight: bold; color: #333;">
-                                                                    </div>
-                                                                    <div
-                                                                        class="col-lg-1 d-flex align-items-center justify-content-center">
-                                                                        <i class="fas fa-equals"></i>
-                                                                    </div>
-                                                                    <div class="col-lg-6">
-                                                                        <input name="nominal_instant" class="bg-white"
-                                                                            required="" id="depositAmountInstant" readonly
-                                                                            style="font-weight: bold; color: #333;">
-                                                                    </div>
-                                                                </div>
-                                                                <span id="depositAmount-error"></span>
-                                                            </div>
-                                                            <div class="col-lg-3">
-                                                                <label id="amountDesc" class="formulir-desc">Contoh: setoran
-                                                                    deposit 50.000, tulis Rp 50 (3 digit dihilangkan)</label>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-        
-                                                    <!-- Submit Button -->
-                                                    <div class="form-group text-center">
-                                                        <div class="row">
-                                                            <div class="col-lg-12">
-                                                                <button name="submit_instant" type="submit"
-                                                                    class="btn-custom full_width">Kirim</button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </form>
-        
-                                    <form id="formDeposit" enctype="multipart/form-data" method="post"
-                                        action="function/deposit.php">
-                                        <div class="transaksi-formulir flip-card">
-                                            <div class="flip-front">
-                                                <div class="formulir-title"><i class="fas fa-wallet"></i> | Formulir Deposit
-                                                </div>
-                                                <div class="formulir-form">
-                                                    <?php
-                                                    $queryzz = mysqli_query($koneksi, "SELECT * FROM tb_web");
-                                                    $zzz = mysqli_fetch_array($queryzz);
-                                                    $kode_unik = $zzz['kode_unik'];
-                                                    ?>
-                                                    
-                                                    
-                                                    <div class="row mb-3">
-                                                        <div class="col-lg-12 d-flex flex-row">
-                                                            <label class="note_addbank">MOHON SELALU PASTIKAN REKENING PENGIRIM DAN REKENING TUJUAN SESUAI DENGAN DATA YANG TERDAFTAR DI BAWAH INI.</label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="mb-3" id="bank-lain">
-                                                        <div class="row">
-                                                            <div class="col-lg-3 d-flex align-items-center">
-                                                                <label>Nomor Rekening Anda</label>
-                                                            </div>
-                                                            <div class="col-lg-6">
-                                                                <div class="input-group">
-                                                                    <!-- Dropdown untuk memilih bank -->
-                                                                    <select name="dari_bank" id="bankMember"
-                                                                        style="font-size: 11px; border-top-left-radius:3px; border-bottom-left-radius:3px; padding: 6px; font-weight: 600; max-width: 180px; white-space: nowrap;">
-                                                                        <?php
-                                                                        $query = mysqli_query($koneksi, "SELECT * FROM tb_bank WHERE id_user = '$extplayer'");
-                                                                        while ($data = mysqli_fetch_array($query)) {
-                                                                            $bank_id = $data['id'];
-                                                                            $nama_bank = htmlspecialchars($data['nama_bank']);
-                                                                            $nomor_rekening = htmlspecialchars($data['nomor_rekening']);
-                                                                            ?>
-                                                                            <option value="<?php echo $bank_id; ?>">
-                                                                                <?php echo "$nama_bank - $nomor_rekening"; ?>
-                                                                            </option>
-                                                                            <?php
-                                                                        }
-                                                                        ?>
-                                                                    </select>
-                                                                    <div class="input-group-append">
-                                                                        <a href="#" data-toggle="modal"
-                                                                            data-target="#bankDetail" id="bankAdd"
-                                                                            class="btn btn-sm btn-secondary ml-0">
-                                                                            <i class="fa fa-plus mr-1"></i> Tambah Bank
-                                                                        </a>
-                                                                    </div>
-                                                                </div>
-        
-                                                                <input type="hidden" name="selected_bank_id"
-                                                                    id="hiddenBankId" />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-        
-                                                    <div class="form-group">
-                                                        <div class="row">
-                                                            <div class="col-lg-3 d-flex align-items-center">
-                                                                <label>Jumlah Deposit</label>
-                                                            </div>
-                                                            <div class="col-lg-6">
-                                                                <div class="row">
-                                                                    <div class="col-lg-5">
-                                                                        <input name="inputdepo" required="" id="depositinput"
-                                                                            type="text" placeholder="50">
-                                                                    </div>
-                                                                    <span class="m-auto">
-                                                                        <i class="fas fa-equals	"></i>
-                                                                    </span>
-                                                                    <div class="col-lg-6">
-                                                                        <input name="nominal" class="bg-white" required=""
-                                                                            id="depositAmount" readonly>
-                                                                    </div>
-                                                                </div>
-                                                                <span id="depositAmount-error"></span>
-                                                            </div>
-                                                            <div class="col-lg-3">
-                                                                <label id="amountDesc" class="formulir-desc">Contoh: setoran
-                                                                    deposit 50.000, tulis Rp 50 ( 3 digit dihilangkan )</label>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-        
-        
-                                                    <div class="form-group mb-0">
-        
-                                                        <div class="row">
-                                                            <div class="col-lg-3 d-flex align-items-center">
-                                                                <label>Pilih Bank</label>
-                                                            </div>
-                                                            <div class="col-lg-6">
-                                                                <select id="bankSelect" name="metode">
-                                                                    <option value="" selected="" disabled="">--- Pilih Bank ---
-                                                                    </option>
-                                                                    <?php
-                                                                    $query = mysqli_query($koneksi, "SELECT * FROM tb_bank WHERE level = 'admin'");
-                                                                    while ($data = mysqli_fetch_array($query)) {
-                                                                        $id_bank = $data['id'];
-                                                                        $nama_bank = $data['nama_bank'];
-                                                                        $nomor_rekening = $data['nomor_rekening'];
-                                                                        $nama_pemilik = $data['nama_pemilik'];
-                                                                        ?>
-                                                                        <option value="<?php echo $id_bank; ?>">
-                                                                            <?php echo $nama_bank; ?>
-                                                                        </option>
-                                                                        <?php
-                                                                    }
-                                                                    ?>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <?php
-                                                    $querya = mysqli_query($koneksi, "SELECT * FROM tb_bank WHERE level = 'admin'");
-                                                    while ($dataq = mysqli_fetch_array($querya)) {
-                                                        $id_bank = $dataq['id'];
-                                                        $nama_bank1 = $dataq['nama_bank'];
-                                                        $nomor_rekening = $dataq['nomor_rekening'];
-                                                        $nama_pemilik = $dataq['nama_pemilik'];
-                                                        $icon = $dataq['icon'];
-                                                        ?>
-                                                        <div class="form-group bankOption" id="epayment-<?php echo $id_bank; ?>"
-                                                            style="display: none;">
-                                                            <div class="row">
-                                                                <div class="col-lg-3"></div>
-                                                                <div class="qris-payment col-lg-6">
-                                                                    <div class="card">
-        
-                                                                        <div class="card-header text-center p-1">
-                                                                            <img class="img-fluid" style="max-height: 150px"
-                                                                                src="<?php echo $icon ?>">
-                                                                        </div>
-                                                                        <div class="card-body text-dark"
-                                                                            style="font-weight: 600; font-size: 11px;">
-                                                                            <div class="row">
-                                                                                <div class="col-6">
-                                                                                    Nama Tujuan Akun:
-                                                                                </div>
-                                                                                <div class="col">
-                                                                                    <?php echo $nama_pemilik; ?>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="row">
-                                                                                <div class="col-6">
-                                                                                    Nomor Akun Tujuan:
-                                                                                </div>
-                                                                                <div class="col-auto flex-shrink-1">
-                                                                                    <a href="javascript:;" name="copyAddress"
-                                                                                        class="copyAddress"
-                                                                                        data-rekening="<?php echo $nomor_rekening; ?>">
-                                                                                        <span><?php echo $nomor_rekening; ?></span>
-                                                                                        <i class="fas fa-copy"></i>
-                                                                                    </a>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="row">
-                                                                                <div class="col-6">
-                                                                                    Min. Deposit:
-                                                                                </div>
-                                                                                <div class="col-6">
-                                                                                    IDR
-                                                                                    <?php echo number_format($min_depo, 0, ',', '.'); ?>
-                                                                                </div>
-        
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <?php
-                                                    }
-                                                    ?>
-        
-        
-                                                    <div class="form-group">
-                                                        <div class="row">
-                                                            <div class="col-lg-3 d-flex align-items-center">
-                                                                <label>Pilih Bonus</label>
-                                                            </div>
-                                                            <div class="col-lg-6">
-                                                                <select name="bonus" id="bankSelect">
-                                                                    <option value="tanpabonus" selected="">Tanpa Bonus</option>
-                                                                    <?php
-                                                                    $query = mysqli_query($koneksi, "SELECT * FROM tb_bonus WHERE status = 'active'");
-                                                                    while ($data = mysqli_fetch_array($query)) {
-                                                                        ?>
-                                                                        <option value="<?php echo $data['id'] ?>">
-                                                                            <?php echo $data['judul']; ?>
-                                                                        </option>
-                                                                        <?php
-                                                                    }
-                                                                    ?>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row mb-3">
-                                                        <div class="col-lg-3 d-flex align-items-center">
-                                                            <label style="font-size: 14px;" id="notesLabel">Keterangan</label>
-                                                        </div>
-                                                        <div class="col-lg-6">
-                                                            <div id="chooseMode" class="">
-                                                                <input id="notes" class="form-control" name="keterangan"
-                                                                    maxlength="100" type="text" placeholder="...">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-lg-3">
-                                                            <input type="hidden" name="phoneCreditMode" />
-                                                            <label style="font-size: 10px;" class="formulir-desc">Maksimal 100
-                                                                Karakter</label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <div class="row">
-                                                            <div class="col-lg-3 d-flex align-items-center">
-                                                                <label>Bukti Pembayaran</label>
-                                                            </div>
-                                                            <div class="col-lg-5">
-                                                                <input id="proof" name="bukti_transfer" type="file" required="">
-                                                            </div>
-                                                            <div class="col-lg-4">
-                                                                <label class="formulir-desc">Hanya format *.jpg, *.jpeg, dan
-                                                                    *.png yang diperbolehkan, maksimal 1 MB</label>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group text-center">
-                                                        <div class="row">
-                                                            <div class="col-lg-12">
-                                                                <button name="submit" type="submit"
-                                                                    class="btn-custom full_width">Kirim</button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </form>
-        
-                                </div>
-                            </div>
-                            <div class="transaksi-info">
-                                <div class="info-header">Informasi</div>
-                                <div class="info-content">
-                                    <p>PERHATIKAN DENGAN SEKSAMA NOMOR REKENING TUJUAN SEBELUM TRANSFER !</p>
-                                    <p>Kami tidak memberikan toleransi apabila terjadi kesalahan transfer uang (Deposit) ke
-                                        rekening yang tidak tertera di website <?php echo $judul; ?>.</p>
-                                    <p>Minimal deposit : Rp.<?php echo number_format($min_depo, 0, ',', '.'); ?><br>Mohon
-                                        Melakukan Deposit Menggunakan Kode Unik<br>Harap melakukan konfirmasi deposit 1x saja,
-                                        dan tunggu permohonan anda diproses untuk dapat melakukan deposit selanjutnya.</p>
-                                    Hubungi Whatsapp RESMI <?php echo $judul; ?> : <a
-                                        href="https://wa.me/<?php echo $whatsapp ?>"><strong>+<?php echo $whatsapp ?></strong></a>
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="transaksi-table-bottom">
-                                <div class="bottom-form">
-                                    <div class="row d-flex align-items-center">
-                                        <div class="col-lg-8">
-                                            <div class="form-title">Informasi</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="container-fluid table-dataTable">
-                                    <table class="table table-hover" id="depositHistoryTable">
-                                        <thead>
-                                            <tr>
-                                                <th>Tanggal</th>
-                                                <th>Pembayaran Ke</th>
-                                                <th>Jumlah</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-        
-                                            <?php
-                                            $query5 = mysqli_query($koneksi, "SELECT * FROM tb_transaksi WHERE id_user = '$extplayer' AND  transaksi = 'Top Up' ORDER BY id DESC LIMIT 7  ");
-                                            while ($data1 = mysqli_fetch_array($query5)) {
-                                                ?>
-                                                <tr>
-                                                    <td><?php echo $data1['tanggal']; ?></td>
-                                                    <td><?php echo $data1['metode']; ?></td>
-                                                    <td>Rp. <?php echo number_format($data1['total']); ?></td>
-                                                    <td>
-                                                        <?php
-                                                        if ($data1['status'] == 'Pending') {
-                                                            ?>
-                                                            <a class="btn btn-small btn-warning btn-sm">Pending</a>
-                                                            <?php
-                                                        } elseif ($data1['status'] == 'Sukses') {
-                                                            ?>
-                                                            <a class="btn btn-small btn-success btn-sm">Sukses</a>
-                                                            <?php
-                                                        } elseif ($data1['status'] == 'Ditolak') {
-                                                            ?>
-                                                            <a class="btn btn-small btn-danger btn-sm">Ditolak</a>
-                                                            <?php
-                                                        } else {
-                                                            ?>
-                                                            <a href="" class="btn btn-small btn-danger btn-sm">Bayar</a>
-                                                            <?php
-                                                        }
-                                                        ?>
-        
-                                                    </td>
-                                                </tr>
-                                                <?php
-                                            }
-                                            ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tab-pane fade" id="nav-withdraw" role="tabpanel" aria-labelledby="nav-withdraw-tab">
-                            <div class="transaksi-grid">
-                                <div class="transaksi-payment">
-                                    <div class="transaksi-payment">
-                                        <div class="payment-item">
-                                            <div class="payment-status online">ONLINE</div>
-                                            <div class="payment-body">
-                                                <div class="payment-icon">
-                                                    <img src="https://statis-images.s3.ap-southeast-1.amazonaws.com/global/payment/V2/IDR/epayment/dana.webp"
-                                                        alt="">
-                                                </div>
-                                                <div class="payment-content">
-                                                    <div class="title">DANA</div>
-                                                    <div class="desc"></div>
-                                                    <div class="desc">Deposit Min =
-                                                        <?php echo number_format($min_depo, 0, ',', '.'); ?>
-                                                    </div>
-                                                    <div class="desc"></div>
-                                                </div>
-                                            </div>
-                                        </div>        
-                                <div class="transaksi-form">
-                                    <form id="formWithdraw" action="function/withdraw.php" method="POST">
-                                        <div class="transaksi-formulir">
-                                            <div class="formulir-title"><i class="fas fa-coins"></i> | Formulir Penarikan</div>
-                                            <div class="formulir-form">
-                                                <div class="form-group">
-                                                    <div class="row">
-                                                        <div class="col-lg-3 d-flex align-items-center">
-                                                            <label>Nama Bank</label>
-                                                        </div>
-                                                        <div class="col-lg-6">
-                                                            <select name="bank" id="bankid">
-                                                                <?php
-                                                                $query = mysqli_query($koneksi, "SELECT * FROM tb_bank WHERE id_user = '$extplayer'");
-                                                                while ($data = mysqli_fetch_array($query)) {
-                                                                    $bank_id = $data['id'];
-                                                                    $nama_bank = htmlspecialchars($data['nama_bank']);
-                                                                    $nomor_rekening = htmlspecialchars($data['nomor_rekening']);
-                                                                    $nama_pemilik = htmlspecialchars($data['nama_pemilik']);
-                                                                    ?>
-                                                                    <option value="<?php echo $bank_id; ?>">
-                                                                        <?php echo "$nama_bank - $nomor_rekening A/N $nama_pemilik"; ?>
-                                                                    </option>
-                                                                    <?php
-                                                                }
-                                                                ?>
-                                                            </select>
-                                                            <!-- Hidden input to store the selected bank id -->
-                                                            <input type="hidden" name="bankwd" id="hiddenBankInput" />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <div class="row">
-                                                        <div class="col-lg-4">
-                                                            <label class="formulir-desc">Saldo yang dapat anda tarik : </label>
-                                                            <div class="balance-wd">IDR:
-                                                                <?php echo number_format($liat['active'], 0, ',', '.'); ?>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <div class="row">
-                                                        <div class="col-lg-3 d-flex align-items-center">
-                                                            <label>Nominal Withdraw</label>
-                                                        </div>
-                                                        <div class="col-lg-5">
-                                                            <input name="withdrawAmount" required="" id="withdrawAmount"
-                                                                class="form-control" type="text" placeholder="...">
-                                                        </div>
-                                                        <span class="m-auto">
-                                                            <i class="fas fa-equals"></i>
-                                                        </span>
-                                                        <div class="col-lg-6">
-                                                            <input name="jumlah" required="" id="withdrawAmountFormatted"
-                                                                class="form-control" readonly>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row mb-3">
-                                                    <div class="col-lg-3 d-flex align-items-center">
-                                                        <label style="font-size: 14px;" id="notesLabel">Keterangan</label>
-                                                    </div>
-                                                    <div class="col-lg-6">
-                                                        <div id="chooseMode" class="">
-                                                            <input id="notes" class="form-control" name="keterangan"
-                                                                maxlength="100" type="text" placeholder="...">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-3">
-                                                        <input type="hidden" name="phoneCreditMode" />
-                                                        <label style="font-size: 10px;" class="formulir-desc">Maksimal 100
-                                                            Karakter</label>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group text-center">
-                                                    <button type="submit" name="submit" class="btn-custom"
-                                                        id="submit-withdraw">Kirim</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                            <div class="transaksi-info">
-                                <div class="info-header">Informasi</div>
-                                <div class="info-content">
-                                    <p>Minimal Withdraw : Rp. <?php echo number_format($min_wd, 0, ',', '.'); ?></p>
-                                    <p>Penarikan DANA Anda akan segera kami proses dengan sangat senang sekali Kami
-                                        <?php echo $judul; ?> Mengucapkan Terima Kasih. Kami tunggu Transaksi anda untuk
-                                        selanjutnya.
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="transaksi-table-bottom">
-                                <div class="bottom-form">
-                                    <div class="row d-flex align-items-center">
-                                        <div class="col-lg-8">
-                                            <div class="form-title">Riwayat Withdraw</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="container-fluid table-dataTable">
-                                    <table class="table table-hover " id="withdrawHistoryTable">
-                                        <thead>
-                                            <tr>
-                                                <th>Tanggal</th>
-                                                <th>Deskripsi</th>
-                                                <th>Jumlah</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-        
-                                            <?php
-                                            $query5 = mysqli_query($koneksi, "SELECT * FROM tb_transaksi WHERE id_user = '$extplayer' AND  transaksi = 'Withdraw' ORDER BY id DESC LIMIT 7  ");
-                                            while ($data1 = mysqli_fetch_array($query5)) {
-                                                ?>
-                                                <tr>
-                                                    <td><?php echo $data1['tanggal']; ?></td>
-                                                    <td><?php echo $data1['transaksi']; ?></td>
-                                                    <td>Rp. <?php echo number_format($data1['total']); ?></td>
-                                                    <td>
-                                                        <?php
-                                                        if ($data1['status'] == 'Pending') {
-                                                            ?>
-                                                            <a class="btn btn-small btn-warning btn-sm">Pending</a>
-                                                            <?php
-                                                        } elseif ($data1['status'] == 'Sukses') {
-                                                            ?>
-                                                            <a class="btn btn-small btn-success btn-small ">Sukses</a>
-                                                            <?php
-                                                        } else if ($data1['status'] == 'Ditolak') {
-                                                            ?>
-                                                                <a class="btn btn-small btn-danger btn-sm">Ditolak</a>
-                                                            <?php
-                                                        } else {
-                                                            ?>
-                                                                <a href="" class="btn btn-small btn-danger btn-sm">Bayar</a>
-                                                            <?php
-                                                        }
-                                                        ?>
-        
-                                                    </td>
-                                                </tr>
-                                                <?php
-                                            }
-                                            ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tab-pane fade" id="nav-claim" role="tabpanel" aria-labelledby="nav-claim-tab">
-                            <div class="transaksi-bonus" style="display: block;">
-                                <div class="claim-bonus">
-                                    <div id="promoPage"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tab-pane fade" id="nav-cashback" role="tabpanel" aria-labelledby="nav-cashback-tab">
-                            <div class="transaksi-bonus" style="display: block;">
-                                <div id="cashbackPage">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal custom-popup fade" id="bankDetail" tabindex="-1" aria-labelledby="bankDetailLabel"
-                aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <i class="fas fa-times"></i>
-                        </button>
-                        <div class="modal-body">
-                            <div class="popup-bank-detail">
-                                <div class="bank-detail-header">
-                                    <h4>Rekening Saya</h4>
-                                </div>
-                                <div class="bank-detail-info">
-                                    <h6 class="info-header">Rekening Utama</h6>
-                                    <?php if ($main_account): ?>
-                                        <div class="bank-account">
-                                            <div class="acc-details">
-                                                <div class="row">
-                                                    <div class="col-lg-12">
-                                                        <div class="acc-name">Nama Rek :
-                                                            <span><?php echo strtoupper(htmlspecialchars($main_account['nama_pemilik'])); ?></span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-12">
-                                                        <div class="bank-name">Nama Bank:
-                                                            <span><?php echo htmlspecialchars($main_account['nama_bank']); ?></span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-12">
-                                                        <div class="bank-name">Nomor Rekening:
-                                                            <span><?php echo htmlspecialchars($main_account['nomor_rekening']); ?></span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    <?php else: ?>
-                                    <?php endif; ?>
-                                    <h6 class="info-header">Rekening Lainnya</h6>
-                                    <?php if ($secondary_accounts): ?>
-                                        <?php foreach ($secondary_accounts as $account): ?>
-                                            <div class="bank-account">
-                                                <div class="acc-details">
-                                                    <div class="row">
-                                                        <div class="col-lg-12">
-                                                            <div class="acc-name">Nama Rek :
-                                                                <span><?php echo strtoupper(htmlspecialchars($account['nama_pemilik'])); ?></span>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-lg-12">
-                                                            <div class="bank-name">Nama Bank:
-                                                                <span><?php echo htmlspecialchars($account['nama_bank']); ?></span>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-lg-12">
-                                                            <div class="bank-name">Nomor Rekening:
-                                                                <span><?php echo htmlspecialchars($account['nomor_rekening']); ?></span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        <?php endforeach; ?>
-                                    <?php else: ?>
-                                    <?php endif; ?>
-                                    <form id="addOptBankForm" action="function/add_bank.php" method="POST"
-                                        novalidate="novalidate" style="display: none;">
-                                        <input type="hidden" name="newData" value="true">
-                                        <input type="hidden" name="id_user" value="<?php echo $b['id']; ?>">
-                                        <div class="add-bank-form">
-                                            <div class="row">
-                                                <div class="col-lg-12">
-                                                    <div class="add-bank-cont">
-                                                        <div class="title">Nama Rek.</div>
-                                                        <input name="optAccountName" class="form-control-sm" type="text"
-                                                            value="<?php echo strtoupper($b['nama_pemilik']); ?>" readonly="">
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-12">
-                                                    <div class="add-bank-cont">
-                                                        <div class="title">Pilih Bank</div>
-                                                        <select class="form-control form-control-sm" name="chooseOptionalBank"
-                                                            id="chooseOptionalBank">
-                                                            <option value="">--- Pilih Bank ---</option>
-                                                            <optgroup label="bank">
-                                                                <option selected disabled="">-- Pilih Akun Bank --</option>
-                                                                <option value="BANK BCA">BANK BCA</option>
-                                                                <option value="BANK BNI">BANK BNI</option>
-                                                                <option value="BANK TABUNGAN NEGARA">BANK TABUNGAN NEGARA
-                                                                </option>
-                                                                <option value="BANK MANDIRI">BANK MANDIRI</option>
-                                                                <option value="BANK MASPION">BANK MASPION</option>
-                                                                <option value="BANK SINARMAS">BANK SINARMAS</option>
-                                                                <option value="BANK MAYORA">BANK MAYORA</option>
-                                                                <option value="BANK BRI">BANK BRI</option>
-                                                                <option value="BANK BCA SYARIAH">BANK BCA SYARIAH</option>
-                                                                <option value="BANK MUAMALAT INDONESIA">BANK MUAMALAT INDONESIA
-                                                                </option>
-                                                                <option value="BANK OCBC NISP">BANK OCBC NISP</option>
-                                                                <option value="BANK UOB">BANK UOB</option>
-                                                                <option value="BANK PERMATA">BANK PERMATA</option>
-                                                                <option value="BANK DANAMON">BANK DANAMON</option>
-                                                                <option value="BANK BUKOPIN">BANK BUKOPIN</option>
-                                                                <option value="BANK CIMB NIAGA">BANK CIMB NIAGA</option>
-                                                                <option value="BANK SYARIAH INDONESIA">BANK SYARIAH INDONESIA
-                                                                </option>
-                                                                <option value="BANK ARTHA GRAHA">BANK ARTHA GRAHA</option>
-                                                                <option value="BANK ARTOS">BANK ARTOS</option>
-                                                                <option value="BANK BJB">BANK BJB</option>
-                                                                <option value="BANK BTPN">BANK BTPN</option>
-                                                                <option value="BANK COMMONWEATLH">BANK COMMONWEATLH</option>
-                                                                <option value="BANK DBS">BANK DBS</option>
-                                                                <option value="BANK DKI">BANK DKI</option>
-                                                                <option value="BANK HSBC">BANK HSBC</option>
-                                                                <option value="BANK JATIM">BANK JATIM</option>
-                                                                <option value="BANK MAYBANK">BANK MAYBANK</option>
-                                                                <option value="BANK MEGA">BANK MEGA</option>
-                                                                <option value="BANK NAGARI">BANK NAGARI</option>
-                                                                <option value="OVO">OVO</option>
-                                                                <option value="GOPAY">GOPAY</option>
-                                                                <option value="DANA">DANA</option>
-                                                                <option value="LINKAJA">LINKAJA</option>
-                                                                <option value="SAKUKU">SAKUKU</option>
-                                                                <option value="SHOPEEPAY">SHOPEEPAY</option>
-                                                            </optgroup>
-                                                        </select>
-                                                        <span id="chooseOptionalBank-error"></span>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-12">
-                                                    <div class="add-bank-cont">
-                                                        <div class="title" id="labelAccNumb">Nomor Rek.</div>
-                                                        <div class="input-group input-group-sm">
-                                                            <div class="input-group-prepend" id="phoneInputPrepend"
-                                                                style="display: none;">
-                                                                <span class="input-group-text">+62</span>
-                                                            </div>
-                                                            <input class="form-control" type="text" name="optAccountNumber"
-                                                                id="optAccountNumber" minlength="8" maxlength="20"
-                                                                autocomplete="off">
-                                                        </div>
-                                                        <span id="optAccountNumber-error"></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="bank-button" id="bankButton">
-                                            <a class="btn-custom-sm" href="#" id="cancelBank" style="display: none;">Batal</a>
-                                            <button id="submitBank" class="btn-custom-sm" style="display: none;">Simpan</button>
-                                        </div>
-                                    </form>
-                                    <a class="btn-custom-sm" href="#" id="addBank">Tambah Rek.</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-        
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                var isExpired = <?php echo json_encode($isExpired); ?>;
-                var checkoutUrl = <?php echo json_encode($checkoutUrl); ?>;
-        
-                document.getElementById('btnInstant').addEventListener('click', function () {
-                    console.log('btnInstant clicked');
-                    if (!isExpired && checkoutUrl) {
-                        window.location.href = checkoutUrl;
-                    } else {
-                        document.getElementById('formInstantDeposit').style.display = 'block';
-                        document.getElementById('formDeposit').style.display = 'none';
-                        this.classList.add('active');
-                        document.getElementById('btnManual').classList.remove('active');
-                    }
-                });
-        
-                document.getElementById('btnManual').addEventListener('click', function () {
-                    document.getElementById('formInstantDeposit').style.display = 'none';
-                    document.getElementById('formDeposit').style.display = 'block';
-                    this.classList.add('active');
-                    document.getElementById('btnInstant').classList.remove('active');
-                });
-            });
-        </script>
-        <script>
-            $(document).ready(function () {
-                // Ketika elemen <select> berubah
-                $("#bankSelect").change(function () {
-                    // Mendapatkan nilai yang dipilih
-                    var selectedValue = $(this).val();
-        
-                    // Semua section yang memiliki class "bankOption" disembunyikan
-                    $(".bankOption").hide();
-        
-                    // Menampilkan elemen dengan ID yang sesuai berdasarkan pilihan
-                    if (selectedValue !== "") {
-                        $("#epayment-" + selectedValue).show();
-                    }
-                });
-        
-                // Event listener untuk semua elemen dengan class "copyAddress"
-                $(document).on('click', '.copyAddress', function () {
-                    // Mendapatkan nomor rekening dari atribut data-rekening
-                    var textToCopy = $(this).data('rekening');
-        
-                    // Membuat elemen textarea sementara
-                    var tempTextarea = document.createElement('textarea');
-                    tempTextarea.value = textToCopy;
-                    document.body.appendChild(tempTextarea);
-        
-                    // Memilih teks dan menyalinnya ke clipboard
-                    tempTextarea.select();
-                    document.execCommand('copy');
-        
-                    // Menghapus elemen sementara
-                    document.body.removeChild(tempTextarea);
-        
-                    // Menampilkan pesan bahwa teks telah disalin
-                    alert('Nomor rekening berhasil disalin!');
-                });
-            });
-        </script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const depositInput = document.getElementById('depositinput');
-                const depositAmount = document.getElementById('depositAmount');
-                const formDeposit = document.getElementById('formDeposit');
-        
-                // Fungsi untuk memformat nilai dengan "IDR : "
-                function formatRupiah(angka) {
-                    let number_string = angka.toString(),
-                        sisa = number_string.length % 3,
-                        rupiah = number_string.substr(0, sisa),
-                        ribuan = number_string.substr(sisa).match(/\d{3}/g);
-        
-                    if (ribuan) {
-                        separator = sisa ? '.' : '';
-                        rupiah += separator + ribuan.join('.');
-                    }
-        
-                    return 'IDR : ' + rupiah;
-                }
-        
-                depositInput.addEventListener('input', function () {
-                    let value = depositInput.value;
-        
-                    // Menghapus karakter non-digit
-                    value = value.replace(/\D/g, '');
-        
-                    // Menambahkan tiga angka nol
-                    if (value) {
-                        value += '000';
-                        depositAmount.value = formatRupiah(value);
-                    } else {
-                        depositAmount.value = 'IDR : ';
-                    }
-                });
-        
-                formDeposit.addEventListener('submit', function (event) {
-                    // Menghapus format mata uang dari nilai depositAmount sebelum pengiriman
-                    const rawAmount = depositAmount.value.replace(/IDR : /, '').replace(/\./g, '');
-                    depositAmount.value = rawAmount;
-                });
-        
-                // Inisialisasi dengan "IDR : "
-                depositAmount.value = 'IDR : ';
-            });
-        </script>
-        <script>
-            function updateHiddenBankInput() {
-                var select = document.getElementById('bankid');
-                var hiddenInput = document.getElementById('hiddenBankInput');
-                hiddenInput.value = select.value;
-            }
-        
-            // Fungsi untuk memformat nilai dengan "IDR : "
-            function formatRupiah(angka) {
-                let number_string = angka.toString(),
-                    sisa = number_string.length % 3,
-                    rupiah = number_string.substr(0, sisa),
-                    ribuan = number_string.substr(sisa).match(/\d{3}/g);
-        
-                if (ribuan) {
-                    separator = sisa ? '.' : '';
-                    rupiah += separator + ribuan.join('.');
-                }
-        
-                return 'IDR : ' + rupiah;
-            }
-        
-            document.addEventListener('DOMContentLoaded', function () {
-                const withdrawInput = document.getElementById('withdrawAmount');
-                const withdrawAmountFormatted = document.getElementById('withdrawAmountFormatted');
-                const formWithdraw = document.getElementById('formWithdraw');
-        
-                withdrawInput.addEventListener('input', function () {
-                    let value = withdrawInput.value;
-        
-                    // Menghapus karakter non-digit
-                    value = value.replace(/\D/g, '');
-        
-                    // Menambahkan tiga angka nol
-                    if (value) {
-                        value += '000';
-                        withdrawAmountFormatted.value = formatRupiah(value);
-                    } else {
-                        withdrawAmountFormatted.value = 'IDR : ';
-                    }
-                });
-        
-                formWithdraw.addEventListener('submit', function (event) {
-                    // Menghapus format mata uang dari nilai withdrawAmountFormatted sebelum pengiriman
-                    const rawAmount = withdrawAmountFormatted.value.replace(/IDR : /, '').replace(/\./g, '');
-                    withdrawAmountFormatted.value = rawAmount;
-                });
-        
-                // Initialize the hidden input with the first option's value
-                updateHiddenBankInput();
-        
-                // Inisialisasi dengan "IDR : "
-                withdrawAmountFormatted.value = 'IDR : ';
-            });
-        </script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const depositInputInstant = document.getElementById('depositinputinstant');
-                const depositAmountInstant = document.getElementById('depositAmountInstant');
-                const formDepositInstant = document.getElementById('formInstantDeposit');
-        
-                // Fungsi untuk memformat nilai dengan "IDR : "
-                function formatRupiah(angka) {
-                    let number_string = angka.toString(),
-                        sisa = number_string.length % 3,
-                        rupiah = number_string.substr(0, sisa),
-                        ribuan = number_string.substr(sisa).match(/\d{3}/g);
-        
-                    if (ribuan) {
-                        separator = sisa ? '.' : '';
-                        rupiah += separator + ribuan.join('.');
-                    }
-        
-                    return 'IDR : ' + rupiah;
-                }
-        
-                depositInputInstant.addEventListener('input', function () {
-                    let value = depositInputInstant.value;
-        
-                    // Menghapus karakter non-digit
-                    value = value.replace(/\D/g, '');
-        
-                    // Menambahkan tiga angka nol
-                    if (value) {
-                        value += '000';
-                        depositAmountInstant.value = formatRupiah(value);
-                    } else {
-                        depositAmountInstant.value = 'IDR : ';
-                    }
-                });
-        
-                formDepositInstant.addEventListener('submit', function (event) {
-                    // Menghapus format mata uang dari nilai depositAmount sebelum pengiriman
-                    const rawAmount = depositAmountInstant.value.replace(/IDR : /, '').replace(/\./g, '');
-                    depositAmountInstant.value = rawAmount;
-                });
-        
-                // Inisialisasi dengan "IDR : "
-                depositAmountInstant.value = 'IDR : ';
-            });
-        </script>
-        
-        <script>
-            $(document).ready(function () {
-                $("#addBank").click(function (event) {
-                    event.preventDefault();
-                    $(this).hide();
-                    $("#addOptBankForm").show();
-                    $(".add-bank-form").show();
-                    $("#submitBank").show();
-                    $("#cancelBank").show();
-                });
-        
-                $("#cancelBank").click(function (event) {
-                    event.preventDefault();
-                    $("#addOptBankForm").hide();
-                    $(".add-bank-form").hide();
-                    $("#addBank").show();
-                    $("#cancelBank").hide();
-                    $("#submitBank").hide();
-                });
-            });
-        </script>
-        <script>
-            $(document).ready(function () {
-                // Ketika elemen <select> berubah
-                $("#bankMember").change(function () {
-                    // Mendapatkan nilai yang dipilih
-                    var selectedValue = $(this).val();
-        
-                    // Menyimpan nilai yang dipilih ke dalam input tersembunyi
-                    $("#hiddenBankId").val(selectedValue);
-                });
-            });
-        </script>
-        <script>
-            $(document).ready(function () {
-                // Ketika elemen <select> berubah
-                $("#bankid").change(function () {
-                    // Mendapatkan nilai yang dipilih
-                    var selectedValue = $(this).val();
-        
-                    // Menyimpan nilai yang dipilih ke dalam input tersembunyi
-                    $("#hiddenBankInput").val(selectedValue);
-                });
-            });
-        </script>
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+    <url>
+        <loc>https://www.domainanda.com/dekstop/index.php</loc>
+        <lastmod>2024-05-17</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://www.domainanda.com/dekstop/template/page/arcade.php</loc>
+        <lastmod>2024-05-17</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    <url>
+        <loc>https://www.domainanda.com/dekstop/template/page/casino.php</loc>
+        <lastmod>2024-05-17</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    <url>
+        <loc>https://www.domainanda.com/dekstop/template/page/home.php</loc>
+        <lastmod>2024-05-17</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    <url>
+        <loc>https://www.domainanda.com/dekstop/template/page/livegame.php</loc>
+        <lastmod>2024-05-17</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    <url>
+        <loc>https://www.domainanda.com/dekstop/template/page/lottery.php</loc>
+        <lastmod>2024-05-17</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    <url>
+        <loc>https://www.domainanda.com/dekstop/template/page/poker.php</loc>
+        <lastmod>2024-05-17</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    <url>
+        <loc>https://www.domainanda.com/dekstop/template/page/popular.php</loc>
+        <lastmod>2024-05-17</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    <url>
+        <loc>https://www.domainanda.com/dekstop/template/page/slot.php</loc>
+        <lastmod>2024-05-17</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    <url>
+        <loc>https://www.domainanda.com/dekstop/template/page/sports.php</loc>
+        <lastmod>2024-05-17</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    <url>
+        <loc>https://www.domainanda.com/mobile/</loc>
+        <lastmod>2024-05-17</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://www.domainanda.com/mobile/index.php</loc>
+        <lastmod>2024-05-17</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://www.domainanda.com/mobile/template/page/arcade.php</loc>
+        <lastmod>2024-05-17</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.5</priority>
+    </url>
+    <url>
+        <loc>https://www.domainanda.com/mobile/template/page/casino.php</loc>
+        <lastmod>2024-05-17</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.5</priority>
+    </url>
+    <url>
+        <loc>https://www.domainanda.com/mobile/template/page/home.php</loc>
+        <lastmod>2024-05-17</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.5</priority>
+    </url>
+    <url>
+        <loc>https://www.domainanda.com/mobile/template/page/livegame.php</loc>
+        <lastmod>2024-05-17</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.5</priority>
+    </url>
+    <url>
+        <loc>https://www.domainanda.com/mobile/template/page/lottery.php</loc>
+        <lastmod>2024-05-17</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.5</priority>
+    </url>
+    <url>
+        <loc>https://www.domainanda.com/mobile/template/page/poker.php</loc>
+        <lastmod>2024-05-17</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.5</priority>
+    </url>
+    <url>
+        <loc>https://www.domainanda.com/mobile/template/page/popular.php</loc>
+        <lastmod>2024-05-17</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.5</priority>
+    </url>
+    <url>
+        <loc>https://www.domainanda.com/mobile/template/page/slot.php</loc>
+        <lastmod>2024-05-17</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.5</priority>
+    </url>
+    <url>
+        <loc>https://www.domainanda.com/mobile/template/page/sports.php</loc>
+        <lastmod>2024-05-17</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.5</priority>
+    </url>
+</urlset>
